@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>help-workshop</id>
+    <version>4.03.0002</version>
+    <packageSourceUrl>https://github.com/hhonisch/chocolatey-packages/src/help-workshop</packageSourceUrl>
+    <owners>Hartmut Honisch</owners>
+    <title>Microsoft Help Workshop</title>
+    <authors>Microsoft</authors>
+    <projectUrl>https://docs.microsoft.com/en-us/previous-versions/visualstudio/foxpro/aa903417(v=vs.71)</projectUrl>
+    <iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/help-workshop.png</iconUrl>
+    <copyright>Microsoft (c) 1994-1997</copyright>
+    <!-- If there is a license Url available, it is required for the community feed -->
+    <!--<projectSourceUrl>Software Source Location - is the software FOSS somewhere? Link to it with this</projectSourceUrl>-->
+    <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
+    <tags>help-workshop winhelp windows help workshop compiler hcw hlp admin</tags>
+    <!--<summary>__REPLACE__</summary>-->
+    <description>Help Workshop is a program that you use to create Help (.hlp) files, edit project and contents files, and test and report on help files.  
+Help Workshop takes the information in the project (.hpj) file to combine the topic (.rtf) files, bitmaps, and other sources into one Help file that can be viewed using the Microsoft Windows Help program.
+	</description>
+  </metadata>
+  <files>
+    <file src="tools\chocolatey*.ps1" target="tools" />
+    <file src="tools\.skipAutoUninstall" target="tools" />
+  </files>
+</package>
