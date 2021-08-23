@@ -3,18 +3,14 @@
   <metadata>
     <id>help-workshop</id>
     <version>4.03.0002</version>
-    <packageSourceUrl>https://github.com/hhonisch/chocolatey-packages/src/help-workshop</packageSourceUrl>
+    <packageSourceUrl>https://github.com/hhonisch/chocolatey-packages/tree/main/src/help-workshop</packageSourceUrl>
     <owners>Hartmut Honisch</owners>
     <title>Microsoft Help Workshop</title>
     <authors>Microsoft</authors>
     <projectUrl>https://docs.microsoft.com/en-us/previous-versions/visualstudio/foxpro/aa903417(v=vs.71)</projectUrl>
-    <iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/help-workshop.png</iconUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/hhonisch/chocolatey-packages@c2a546097d402178d83ebc1220bd49a7926236dd/data/help-workshop/icon-help-workshop.png</iconUrl>
     <copyright>Microsoft (c) 1994-1997</copyright>
-    <!-- If there is a license Url available, it is required for the community feed -->
-    <!--<projectSourceUrl>Software Source Location - is the software FOSS somewhere? Link to it with this</projectSourceUrl>-->
-    <!--<docsUrl>At what url are the software docs located?</docsUrl>-->
     <tags>help-workshop winhelp windows help workshop compiler hcw hlp admin</tags>
-    <!--<summary>__REPLACE__</summary>-->
     <description>Help Workshop is a program that you use to create Help (.hlp) files, edit project and contents files, and test and report on help files.  
 Help Workshop takes the information in the project (.hpj) file to combine the topic (.rtf) files, bitmaps, and other sources into one Help file that can be viewed using the Microsoft Windows Help program.
 	</description>
