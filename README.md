@@ -1,1 +1,1 @@
-# chocolatey-packages
+# Chocolatey package for Microsoft Help Workshop

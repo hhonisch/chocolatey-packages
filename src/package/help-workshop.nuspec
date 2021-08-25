@@ -3,13 +3,13 @@
   <metadata>
     <id>help-workshop</id>
     <version>4.0.3.200</version>
-    <packageSourceUrl>https://github.com/hhonisch/chocolatey-packages/tree/main/src/help-workshop</packageSourceUrl>
+    <packageSourceUrl>https://github.com/hhonisch/chocolatey.help-workshop</packageSourceUrl>
     <owners>Hartmut Honisch</owners>
     <title>Microsoft Help Workshop</title>
     <authors>Microsoft</authors>
     <projectUrl>https://docs.microsoft.com/en-us/previous-versions/visualstudio/foxpro/aa903417(v=vs.71)</projectUrl>
-    <iconUrl>https://cdn.jsdelivr.net/gh/hhonisch/chocolatey-packages@c2a546097d402178d83ebc1220bd49a7926236dd/data/help-workshop/icon-help-workshop.png</iconUrl>
-    <licenseUrl>https://cdn.jsdelivr.net/gh/hhonisch/chocolatey-packages@c2a546097d402178d83ebc1220bd49a7926236dd/data/help-workshop/License.txt</licenseUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/hhonisch/chocolatey.help-workshop@8b6c9c78b32832169228fd585c3da05f210caa74/data/icon-help-workshop.png</iconUrl>
+    <licenseUrl>https://cdn.jsdelivr.net/gh/hhonisch/chocolatey.help-workshop@8b6c9c78b32832169228fd585c3da05f210caa74/data/License.txt</licenseUrl>
     <copyright>Microsoft (c) 1994-1997</copyright>
     <tags>help-workshop winhelp windows help workshop compiler hcw hlp admin</tags>
     <summary>Use the Microsoft Help Workshop to create Winhelp files.</summary>
