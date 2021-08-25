@@ -1,0 +1,53 @@
+<Project DefaultTargets="Clean;Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <BinDir>$(MSBuildProjectDirectory)\..\bin</BinDir>
+        <DistDir>$(MSBuildProjectDirectory)\..\dist</DistDir>
+        <PackageDir>$(MSBuildProjectDirectory)\..\src\package</PackageDir>
+        <BuildNo>0</BuildNo>
+        <BuildNoOffset>0</BuildNoOffset>
+    </PropertyGroup>
+
+    <!-- Clean dist files -->
+    <Target Name="CleanDist">
+        <ItemGroup>
+            <DistFiles Include="$(DistDir)\*.nupkg"/>
+        </ItemGroup>
+        <Delete Files="@(DistFiles)"/>
+    </Target>
+
+
+    <!-- Clean bin files -->
+    <Target Name="CleanBin">
+    </Target>
+
+
+    <!-- Clean package files -->
+    <Target Name="CleanPackage">
+        <ItemGroup>
+            <PackageFiles Include="$(PackageDir)\*.nupkg"/>
+        </ItemGroup>
+        <Delete Files="@(PackageFiles)"/>
+    </Target>
+
+
+    <!-- Clean everything -->
+    <Target Name="Clean" DependsOnTargets="CleanDist;CleanBin;CleanPackage"/>
+
+
+    <!-- Build Setup -->
+    <Target Name="BuildPackage">
+        <!-- Run Chocolatey -->
+        <Exec Command="choco pack" WorkingDirectory="$(PackageDir)"/>
+        <ItemGroup>
+            <PackageFiles Include="$(PackageDir)\*.nupkg"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(DistDir)"/>
+    </Target>
+
+
+    <!-- Build everything -->
+    <Target Name="Build" DependsOnTargets="BuildPackage"/>
+
+  
+</Project>
