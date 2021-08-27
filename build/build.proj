@@ -4,9 +4,18 @@
         <BinDir>$(MSBuildProjectDirectory)\..\bin</BinDir>
         <DistDir>$(MSBuildProjectDirectory)\..\dist</DistDir>
         <PackageDir>$(MSBuildProjectDirectory)\..\src\package</PackageDir>
+        <InstallHelperDir>$(MSBuildProjectDirectory)\..\src\HcwInstallHelper</InstallHelperDir>
         <BuildNo>0</BuildNo>
         <BuildNoOffset>0</BuildNoOffset>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- InstallHelper configuration -->
+        <InstallHelperConfs Include="$(InstallHelperDir)\HcwInstallHelper.sln">
+            <AdditionalProperties>Configuration=Release;Platform=Any CPU</AdditionalProperties>
+        </InstallHelperConfs>
+    </ItemGroup>
+
 
     <!-- Clean dist files -->
     <Target Name="CleanDist">
@@ -19,6 +28,16 @@
 
     <!-- Clean bin files -->
     <Target Name="CleanBin">
+        <ItemGroup>
+            <BinFiles Include="$(BinDir)\*" Exclude="$(BinDir)\*.keep"/>
+        </ItemGroup>
+        <Delete Files="@(BinFiles)"/>
+    </Target>
+
+
+    <!-- Clean InstallHelper -->
+    <Target Name="CleanInstallHelper">
+        <MSBuild Projects="@(InstallHelperConfs)" Targets="Clean"/>
     </Target>
 
 
@@ -32,10 +51,24 @@
 
 
     <!-- Clean everything -->
-    <Target Name="Clean" DependsOnTargets="CleanDist;CleanBin;CleanPackage"/>
+    <Target Name="Clean" DependsOnTargets="CleanDist;CleanBin;CleanInstallHelper;CleanPackage"/>
 
 
-    <!-- Build Setup -->
+    <!-- Build InstallHelper -->
+    <Target Name="BuildInstallHelper">
+        <!-- Build binaries -->
+        <MSBuild Projects="@(InstallHelperConfs)" Targets="Restore;Build" Properties="RestorePackagesConfig=true" BuildInParallel="true"/>
+        
+        <!-- Run unit tests -->
+        <Exec Command="vstest.console HcwInstallHelperTest.dll" WorkingDirectory="$(InstallHelperDir)\HcwInstallHelperTest\bin\Release"/>
+
+        <!-- Export binaries -->
+        <Copy SourceFiles="$(InstallHelperDir)\HcwInstallHelper\bin\Release\HcwInstallHelper.exe" DestinationFolder="$(BinDir)"/>
+        <Copy SourceFiles="$(InstallHelperDir)\HcwInstallHelper\bin\Release\HcwInstallHelper.exe.config" DestinationFolder="$(BinDir)"/>
+    </Target>
+
+
+    <!-- Build Package -->
     <Target Name="BuildPackage">
         <!-- Run Chocolatey -->
         <Exec Command="choco pack" WorkingDirectory="$(PackageDir)"/>
@@ -47,7 +80,7 @@
 
 
     <!-- Build everything -->
-    <Target Name="Build" DependsOnTargets="BuildPackage"/>
+    <Target Name="Build" DependsOnTargets="BuildInstallHelper;BuildPackage"/>
 
   
 </Project>

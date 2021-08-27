@@ -20,5 +20,8 @@ Help Workshop takes the information in the project (.hpj) file to combine the to
   <files>
     <file src="tools\chocolatey*.ps1" target="tools" />
     <file src="tools\.skipAutoUninstall" target="tools" />
+    <file src="tools\*.ignore" target="tools" />
+    <file src="..\..\bin\HcwInstallHelper.exe" target="tools" />
+    <file src="..\..\bin\HcwInstallHelper.exe.config" target="tools" />
   </files>
 </package>
