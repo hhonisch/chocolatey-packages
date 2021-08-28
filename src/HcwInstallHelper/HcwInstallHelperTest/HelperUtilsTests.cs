@@ -10,7 +10,7 @@ namespace HcwInstallHelper.Tests
         [TestMethod()]
         public void GetSpecialFolderPathTest()
         {
-            String commonPrograms = HelperUtils.GetSpecialFolderPath(0x17);
+            String commonPrograms = HelperUtils.GetSpecialFolderPath(HelperUtils.CSIDL.CSIDL_COMMON_PROGRAMS);
             String commonProgramsExpected = Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms);
             Assert.AreEqual(commonProgramsExpected, commonPrograms);
 

@@ -124,6 +124,12 @@ namespace HcwInstallHelper
                 throw new Exception("Error: CRC32 checksum mismatch");
             }
 
+            // if traget file exists, make sure we can overwrite it
+            if (File.Exists(destFileName))
+            {
+                File.SetAttributes(destFileName, FileAttributes.Normal);
+            }
+
             // Write uncompressed content to file
             msUncompressedContent.Position = 0;
             using (var fileStreamOut = new FileStream(destFileName, FileMode.Create, FileAccess.Write))
