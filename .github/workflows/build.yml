@@ -25,10 +25,14 @@ jobs:
       # We need msbuild
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.2
+       
+      # We need VSTest       
+      - name: Setup VSTest Path
+        uses: darenm/Setup-VSTest@v1
 
       # Build artifacts
       - name: Build
-        run: msbuild .\build\build.proj /t:GithubBuild /p:BuildNo=${{github.run_number}}
+        run: msbuild .\build\build.proj /t:GithubBuild
 
       # Upload arifacts to make them available for next job
       - name: Upload artifacts
