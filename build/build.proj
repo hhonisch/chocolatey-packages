@@ -82,5 +82,8 @@
     <!-- Build everything -->
     <Target Name="Build" DependsOnTargets="BuildInstallHelper;BuildPackage"/>
 
+
+    <!-- Github Build -->
+    <Target Name="GithubBuild" DependsOnTargets="Build"/>
   
 </Project>
