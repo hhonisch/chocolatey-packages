@@ -41,9 +41,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChecksumHelper.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="HelperUtils.cs" />
     <Compile Include="IniFile.cs" />
     <Compile Include="InstallHelper.cs" />
+    <Compile Include="InstallLog.cs" />
     <Compile Include="MvaArchiveExtractor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

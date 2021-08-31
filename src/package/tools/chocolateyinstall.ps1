@@ -1,9 +1,8 @@
 ﻿$ErrorActionPreference = 'Stop'
 
 $packageName = $env:ChocolateyPackageName
-$url = 'https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe'
-$checksum = 'F666E3C1A12C750167F407C48D4371065C911942CAA42847E710B7584D23F81B'
-
+$hcwSetupDownloadUrl = 'https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe'
+$hcwSetupChecksum = 'F666E3C1A12C750167F407C48D4371065C911942CAA42847E710B7584D23F81B'
 
 [string] $toolsDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
@@ -15,6 +14,10 @@ if (!$pp['InstallDir']) {
     if (${env:ProgramFiles(x86)}) { $pp['InstallDir'] = Join-Path ${env:ProgramFiles(x86)} "Help Workshop" }
     else { $pp['InstallDir'] = Join-Path $env:ProgramFiles "Help Workshop" }
 }
+# Location of help workshop setup
+if (!$pp['HcwSetupLocation']) { 
+    $pp['HcwSetupLocation'] = $hcwSetupDownloadUrl
+}
 
 $tmpDir = $null
 try {
@@ -25,7 +28,7 @@ try {
 
     # Download setup
     $hcSetupExe = Join-Path $tmpDir "Hcwsetup.exe"
-    Get-ChocolateyWebFile -PackageName $packageName -FileFullPath $hcSetupExe -Url  $url -Checksum $checksum -ChecksumType "sha256" | Out-Null
+    Get-ChocolateyWebFile -PackageName $packageName -FileFullPath $hcSetupExe -Url  ($pp['HcwSetupLocation']) -Checksum $hcwSetupChecksum -ChecksumType "sha256" | Out-Null
     Write-Host "HelpWorkshop Setup downloaded to $hcSetupExe"
 
     Write-Host "Extracting $hcSetupExe"
@@ -34,7 +37,7 @@ try {
     Write-Host "Running HcwInstallHelper..."
     & "$toolsDir\HcwInstallHelper.exe" install $tmpDir $pp['InstallDir']
     if ($LASTEXITCODE -ne 0) {
-        throw "HcwInstallHelper returned an error"
+        Write-Error "HcwInstallHelper returned an error"
     }
 }
 finally {

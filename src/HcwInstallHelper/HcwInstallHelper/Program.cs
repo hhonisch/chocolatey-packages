@@ -35,7 +35,7 @@ namespace HcwInstallHelper
             // Perform uninstall
             if (mainCommand == MainCommand.mcUninstall)
             {
-                return UninstallHelper.Start();
+                return UninstallHelper.Start(installDir);
             }
 
 
@@ -71,8 +71,9 @@ namespace HcwInstallHelper
             }
 
             // Uninstall mode
-            if ((args.Length == 1) && (args[0] == "uninstall"))
+            if ((args.Length == 2) && (args[0] == "uninstall"))
             {
+                installDir = args[1].Trim();
                 mainCommand = MainCommand.mcUninstall;
                 return true;
             }
@@ -89,7 +90,7 @@ namespace HcwInstallHelper
             Console.WriteLine("Install helper for Chocolatey package help-workshop\n");
             Console.WriteLine("Usage:");
             Console.WriteLine("HcwInstallHelper install <setup_files_dir> <install_dir>");
-            Console.WriteLine("HcwInstallHelper uninstall");
+            Console.WriteLine("HcwInstallHelper uninstall <install_dir>");
         }
     }
 }

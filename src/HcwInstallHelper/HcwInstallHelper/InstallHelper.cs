@@ -8,22 +8,6 @@ namespace HcwInstallHelper
     // Perform Hcw Install
     public class InstallHelper
     {
-        // Uninstall registry path 32 bit and 64 bit
-        private const string REG_PATH_UNINSTALL_BASE = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-
-        // Uninstall registry key
-        private const string REG_KEY_UNINSTALL = "Help Workshop";
-
-        // Uninstall display name
-        private const string UNINSTALL_DISPLAY_NAME = "Help Workshop";
-
-        // Name of start menu group
-        private const string START_MENU_GROUP = "Microsoft Help Workshop";
-
-        // Name of install logfile
-        private const string INSTALL_LOGFILE = "Help Workshop.log";
-
-
         // Start install
         internal static int Start(string sourceDir, string installDir)
         {
@@ -47,93 +31,37 @@ namespace HcwInstallHelper
             // Load installer ini
             IniFile installerIni = new IniFile(Path.Combine(sourceDir, "_instpgm.ini"));
 
+            // Create install log
+            InstallLog installLog = new InstallLog(Path.Combine(installDir, Constants.INSTALL_LOGFILE));
+            installLog.LogCreatedDir(installDir);
+            installLog.LogCreatedFile($".\\{Constants.INSTALL_LOGFILE}");
+
             // Copy plain files to install dir
-            CopyPlainFiles(sourceDir, installDirFull);
+            CopyPlainFiles(sourceDir, installDirFull, installLog);
 
             // Extract files from MVA archives
-            var mvaArchives = new List<MvaArchiveData>();
-            mvaArchives.Add(new MvaArchiveData("hcw"));
-            mvaArchives.Add(new MvaArchiveData("dbhe"));
-            mvaArchives.Add(new MvaArchiveData("Graphics"));
-            ExtractFilesFromArchives(sourceDir, installDirFull, mvaArchives);
+            ExtractFilesFromArchives(sourceDir, installDirFull, installLog);
 
             // Create registry keys
-            CreateRegistryKeys(installDirFull);
+            CreateRegistryKeys(installDirFull, installLog);
 
             // Create start menu entries
-            CreateStartMenuEntries(installDirFull, installerIni);
+            CreateStartMenuEntries(installDirFull, installerIni, installLog);
 
-            // Create install log
-            CreateInstallLog(installDirFull, installerIni, mvaArchives);
-
+            // Done
             Console.WriteLine("Done performing install");
             return 0;
         }
 
 
-        // Create install log
-        private static void CreateInstallLog(string installDir, IniFile installerIni, List<MvaArchiveData> archives)
-        {
-            var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-            var setupLogFilename = Path.Combine(winDir, INSTALL_LOGFILE);
-            Console.WriteLine("Creating install log {setupLogFilename}...");
-
-            // Remove any existing install logs
-            if (File.Exists(setupLogFilename))
-            {
-                Console.WriteLine("  Remove existing install log...");
-                File.SetAttributes(setupLogFilename, FileAttributes.Normal);
-                File.Delete(setupLogFilename);
-            }
-
-            // Setup log ini file
-            Console.WriteLine("  Write install log...");
-            IniFile setupLog = new IniFile(setupLogFilename);
-
-            // Process section "install"
-            var sectionLines = installerIni.GetSection("Install");
-            foreach (var line in sectionLines)
-            {
-                var lineSplit = line.Split('=');
-                setupLog.WriteString("Install", lineSplit[0], "0|1|0");
-            }
-
-            // Process archive files
-            foreach (var archive in archives)
-            {
-                foreach (var fileName in archive.files)
-                {
-                    setupLog.WriteString(archive.archiveName, fileName, "0|1|0");
-                }
-            }
-
-            // Process section "destinations"
-            var v = installerIni.GetString("destinations", "0", "");
-            setupLog.WriteString("destinations", "0", $"{v}|{installDir}\\");
-
-            // Process section "groups"
-            sectionLines = installerIni.GetSection("groups");
-            setupLog.WriteSection("groups", sectionLines);
-
-            // Process section "targets"
-            sectionLines = installerIni.GetSection("targets");
-            foreach (var line in sectionLines)
-            {
-                var lineSplit = line.Split('=');
-                var fileName = lineSplit[0];
-                var path = Path.Combine(installDir, fileName);
-                setupLog.WriteString("targets", fileName, $"{lineSplit[1]}|{path}");
-            }
-        }
-
-
         // Create start menu entries
-        private static void CreateStartMenuEntries(string installDir, IniFile installerIni)
+        private static void CreateStartMenuEntries(string installDir, IniFile installerIni, InstallLog installLog)
         {
             Console.WriteLine("Creating start menu entries...");
 
             // Create start menu folder
-            string startMenuFolder = Path.Combine(HelperUtils.GetSpecialFolderPath(HelperUtils.CSIDL.CSIDL_COMMON_PROGRAMS), START_MENU_GROUP);
+            string startMenuFolder = Path.Combine(HelperUtils.GetSpecialFolderPath(HelperUtils.CSIDL.CSIDL_COMMON_PROGRAMS), Constants.START_MENU_GROUP);
+            installLog.LogCreatedDir(startMenuFolder);
             if (!Directory.Exists(startMenuFolder))
             {
                 Console.WriteLine($"  Creating {startMenuFolder}...");
@@ -142,17 +70,18 @@ namespace HcwInstallHelper
 
             // Create entries
             var shell = new IWshRuntimeLibrary.WshShell();
-            var sectionLines = installerIni.GetSection("targets");
-            foreach (var line in sectionLines)
+
+            string[] shortcutFileNames = { "hcw.exe", "hcw.hlp", "dbhe.exe" };
+
+            foreach (var fileName in shortcutFileNames)
             {
-                string[] v = line.Split('=');
-                var fileName = v[0];
-                var shortcutParams = v[1].Split('|');
+                var shortcutParams = installerIni.GetString("targets", fileName, "").Split('|');
                 var shortcutName = shortcutParams[3];
                 var shortcutArguments = shortcutParams[4];
                 var shortcutPath = Path.Combine(startMenuFolder, $"{shortcutName}.lnk");
                 var shortcutTargetPath = Path.Combine(installDir, fileName);
                 Console.WriteLine($"  Creating {shortcutPath}...");
+                installLog.LogCreatedFile(shortcutPath);
                 var shortcut = shell.CreateShortcut(shortcutPath);
                 shortcut.TargetPath = shortcutTargetPath;
                 shortcut.Arguments = shortcutArguments;
@@ -163,35 +92,39 @@ namespace HcwInstallHelper
 
 
         // Create registry keys
-        private static void CreateRegistryKeys(string installDir)
+        private static void CreateRegistryKeys(string installDir, InstallLog installLog)
         {
             Console.WriteLine("Creating registry keys...");
-            Console.WriteLine("  Creating uninstall registry key...");
 
-            // Create uninstall registry key using 32 bit registry
+            // Create app path entries
             using (var regHklm32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-            using (var regUninstallBase = regHklm32.OpenSubKey(REG_PATH_UNINSTALL_BASE, true))
+            using (var regAppPathsBase = regHklm32.OpenSubKey(Constants.REG_PATH_APP_PATHS, true))
             {
-                RegistryKey regUninstall = null;
-                try
+                string[] appPathFileNames = { "hcw.exe", "hcrtf.exe", "dbhe.exe" };
+                foreach (var appPathFileName in appPathFileNames)
                 {
-                    // Open / create uninstall key
-                    regUninstall = regUninstallBase.OpenSubKey(REG_KEY_UNINSTALL, true);
-                    if (regUninstall == null)
+                    RegistryKey regAppPath = null;
+                    try
                     {
-                        regUninstall = regUninstallBase.CreateSubKey(REG_KEY_UNINSTALL);
+                        installLog.LogCreatedRegKey($"HKLM32\\{Constants.REG_PATH_APP_PATHS}\\{appPathFileName}");
+                        // Open / create key
+                        regAppPath = regAppPathsBase.OpenSubKey(appPathFileName, true);
+                        if (regAppPath == null)
+                        {
+                            regAppPath = regAppPathsBase.CreateSubKey(appPathFileName);
+                        }
+                        // Set full exe path
+                        regAppPath.SetValue("", Path.Combine(installDir, appPathFileName));
+                        // Set path
+                        regAppPath.SetValue("Path", HelperUtils.EnsureTrailingPathDelimiter(installDir));
                     }
-                    // Set values
-                    regUninstall.SetValue("DisplayName", UNINSTALL_DISPLAY_NAME);
-                    var uninstallExe = Path.Combine(installDir, "_instpgm.exe");
-                    regUninstall.SetValue("UninstallString", $"\"{uninstallExe}\" /U");
-                }
-                finally
-                {
-                    // Cleanup
-                    if (regUninstall != null)
+                    finally
                     {
-                        regUninstall.Close();
+                        // Cleanup
+                        if (regAppPath != null)
+                        {
+                            regAppPath.Close();
+                        }
                     }
                 }
             }
@@ -199,24 +132,35 @@ namespace HcwInstallHelper
 
 
         // Extract files from MVA archives
-        private static void ExtractFilesFromArchives(string sourceDir, string installDir, List<MvaArchiveData> archives)
+        private static void ExtractFilesFromArchives(string sourceDir, string installDir, InstallLog installLog)
         {
             Console.WriteLine($"Extract files from archives...");
-            foreach (var archiveData in archives)
+            string[] archiveNames = { "hcw.mva", "dbhe.mva", "Graphics.mva" };
+
+            var archiveExtractor = new MvaArchiveExtractor();
+            archiveExtractor.BeforeFileExtract += (sender, eventArgs) =>
+                {
+                    var pureFileName = Path.GetFileName(eventArgs.ArchiveItemHeader.FileName);
+                    Console.WriteLine($"    Extracting archive item {pureFileName}...");
+                    installLog.LogCreatedFile($".\\{pureFileName}");
+                };
+
+            foreach (var archiveName in archiveNames)
             {
                 // Extract archive
-                var archivePath = Path.Combine(sourceDir, $"{archiveData.archiveName}.mva");
-                MvaArchiveExtractor.ExtractArchive(archivePath, installDir, archiveData.files, (msg) => { Console.WriteLine($"  {msg}"); });
+                var archivePath = Path.Combine(sourceDir, $"{archiveName}");
+                Console.WriteLine($"  Extracting archive {archivePath} to {installDir}");
+                archiveExtractor.ExtractArchive(archivePath, installDir);
             }
         }
 
 
         // Copy plain files to install dir
-        private static void CopyPlainFiles(string sourceDir, string installDir)
+        private static void CopyPlainFiles(string sourceDir, string installDir, InstallLog installLog)
         {
             Console.WriteLine($"Copy files...");
             // Copy files
-            string[] filesToCopy = { "license.txt", "_instpgm.exe", "_iwdinst.exe" };
+            string[] filesToCopy = { "license.txt" };
             foreach (string fileName in filesToCopy)
             {
                 Console.WriteLine($"  Copying {fileName} to {installDir}");
@@ -229,22 +173,8 @@ namespace HcwInstallHelper
                     File.SetAttributes(destFileName, FileAttributes.Normal);
                 }
                 // Copy file
+                installLog.LogCreatedFile($".\\{fileName}");
                 File.Copy(sourceFileName, destFileName, true);
-            }
-        }
-
-
-        // Contains data of extracted MVA archive
-        private class MvaArchiveData
-        {
-            internal string archiveName;
-            internal List<string> files;
-
-            // Constructor 
-            public MvaArchiveData(string archiveName)
-            {
-                this.archiveName = archiveName;
-                this.files = new List<string>();
             }
         }
     }

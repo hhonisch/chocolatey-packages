@@ -10,8 +10,14 @@ namespace HcwInstallHelper
     // Extract Mva archive
     public class MvaArchiveExtractor
     {
+        // Event fired before file extracting starts
+        public event EventHandler<BeforeFileExtractArgs> BeforeFileExtract;
+
+        // Event fired when extracting file complete
+        public event EventHandler<FileExtractedArgs> FileExtracted;
+
         // Valid Zlib headers
-        private static ushort[] ZLIB_HEADERS = new ushort[] { 0x0178, 0x5e78, 0x9c78, 0xda78 };
+        private static readonly ushort[] ZLIB_HEADERS = new ushort[] { 0x0178, 0x5e78, 0x9c78, 0xda78 };
 
         // Buffer for stream copy
         private static byte[] copyStreamBuffer;
@@ -41,10 +47,8 @@ namespace HcwInstallHelper
         private const byte ADLER32_CHECKSUM_SIZE = 4;
 
         // Constructor
-        public static void ExtractArchive(string mvaFileName, string destDir, List<string> extractedFiles, Action<string> onLogMessage)
+        public void ExtractArchive(string mvaFileName, string destDir)
         {
-            onLogMessage($"Extracting archive {mvaFileName} to {destDir}");
-
             // Open archive as stream
             using (Stream fileStreamIn = new FileStream(mvaFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (Stream bufferedStreamIn = new BufferedStream(fileStreamIn))
@@ -55,29 +59,27 @@ namespace HcwInstallHelper
                 ReadArchiveHeader(binReader);
 
                 // Struct for item header data
-                ArchiveItemHeader archiveItemHeader;
                 while (binReader.PeekChar() != -1)
                 {
                     // Read archive item header
-                    ReadArchiveItemHeader(binReader, out archiveItemHeader);
+                    ReadArchiveItemHeader(binReader, out ArchiveItemHeader archiveItemHeader);
 
                     // Build destination file name
                     string pureFileName = Path.GetFileName(archiveItemHeader.FileName);
                     string destFileName = Path.Combine(destDir, pureFileName);
-                    extractedFiles.Add(pureFileName);
 
                     // Extract archive item
-                    ExtractArchiveItem(binReader, archiveItemHeader, destFileName, onLogMessage);
+                    BeforeFileExtract?.Invoke(this, new BeforeFileExtractArgs(archiveItemHeader));
+                    ExtractArchiveItem(binReader, archiveItemHeader, destFileName);
+                    FileExtracted?.Invoke(this, new FileExtractedArgs(archiveItemHeader));
                 }
             }
         }
 
 
         // Read archive item header
-        private static void ExtractArchiveItem(BinaryReader binReader, ArchiveItemHeader itemHeader, string destFileName, Action<string> onLogMessage)
+        private void ExtractArchiveItem(BinaryReader binReader, ArchiveItemHeader itemHeader, string destFileName)
         {
-            onLogMessage($"  Extracting archive item {destFileName}...");
-
             // Save current stream position
             int streamPosStart = (int)binReader.BaseStream.Position;
 
@@ -143,7 +145,7 @@ namespace HcwInstallHelper
 
 
         // Copy data from stream to stream
-        private static void CopyStream(Stream input, Stream output, int numBytes = 0)
+        private void CopyStream(Stream input, Stream output, int numBytes = 0)
         {
             // Lazy initialize buffer
             if (copyStreamBuffer == null)
@@ -155,10 +157,10 @@ namespace HcwInstallHelper
             {
                 numBytes = int.MaxValue;
             }
-            int numBytesRead = 0;
+
             while (numBytes > 0)
             {
-                numBytesRead = input.Read(copyStreamBuffer, 0, Math.Min(copyStreamBuffer.Length, numBytes));
+                int numBytesRead = input.Read(copyStreamBuffer, 0, Math.Min(copyStreamBuffer.Length, numBytes));
                 if (numBytesRead > 0)
                 {
                     output.Write(copyStreamBuffer, 0, numBytesRead);
@@ -173,7 +175,7 @@ namespace HcwInstallHelper
 
 
         // Extract archive item
-        private static void ReadArchiveItemHeader(BinaryReader binReader, out ArchiveItemHeader itemHeader)
+        private void ReadArchiveItemHeader(BinaryReader binReader, out ArchiveItemHeader itemHeader)
         {
             // Save current stream position
             int streamPosStart = (int)binReader.BaseStream.Position;
@@ -239,7 +241,7 @@ namespace HcwInstallHelper
 
 
         // Read archive header
-        private static void ReadArchiveHeader(BinaryReader binReader)
+        private void ReadArchiveHeader(BinaryReader binReader)
         {
             // Save current stream position
             int streamPosStart = (int)binReader.BaseStream.Position;
@@ -265,7 +267,7 @@ namespace HcwInstallHelper
 
 
         // Archive item header data struct
-        private struct ArchiveItemHeader
+        public struct ArchiveItemHeader
         {
             internal string FileName;
             internal DateTime LastModified;
@@ -273,6 +275,30 @@ namespace HcwInstallHelper
             internal int SizeCompressed;
             internal int SizeUncompressed;
             internal uint Crc32Checksum;
+        }
+
+
+        // Arguments for BeforeFileExtract event
+        public class BeforeFileExtractArgs : EventArgs
+        {
+            public BeforeFileExtractArgs(ArchiveItemHeader archiveItemHeader)
+            {
+                ArchiveItemHeader = archiveItemHeader;
+            }
+
+            public ArchiveItemHeader ArchiveItemHeader { get; }
+        }
+
+
+        // Arguments for FileExtracted event
+        public class FileExtractedArgs : EventArgs
+        {
+            public FileExtractedArgs(ArchiveItemHeader archiveItemHeader)
+            {
+                ArchiveItemHeader = archiveItemHeader;
+            }
+
+            public ArchiveItemHeader ArchiveItemHeader { get; }
         }
     }
 }

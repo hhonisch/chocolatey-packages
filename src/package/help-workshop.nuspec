@@ -13,7 +13,7 @@
     <copyright>Microsoft (c) 1994-1997</copyright>
     <tags>help-workshop winhelp windows help workshop compiler hcw hlp admin</tags>
     <summary>Use the Microsoft Help Workshop to create Winhelp files.</summary>
-    <description>Help Workshop is a program that you use to create Help (.hlp) files, edit project and contents files, and test and report on help files.  
+    <description>Help Workshop is a program that you use to create Help (.hlp) files, edit project and contents files, and test and report on help files.\
 Help Workshop takes the information in the project (.hpj) file to combine the topic (.rtf) files, bitmaps, and other sources into one Help file that can be viewed using the Microsoft Windows Help program.
 
 ### Package Specific
@@ -21,8 +21,11 @@ Help Workshop takes the information in the project (.hpj) file to combine the to
 The following package parameters can be set:
 
  * `/InstallDir:` - Where to install the binaries to - defaults to "`$env:ProgramFiles(x86)`" on 64 bit Windows and "`$env:ProgramFiles`" on 32 bit Windows
+ * `/HcwSetupLocation:` - Where to get Help Workshop setup (hcwsetup.exe) from - may be either a URL (http:// or https:// or file://) or a path.\
+   Defaults "`https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe"`
+ 
 
-To pass parameters, use `--params "''"` (e.g. `choco install help-workshop [other options] --params="'/InstallDir:C:\Help Workshop'"`).  
+To pass parameters, use `--params "''"` (e.g. `choco install help-workshop [other options] --params="'/InstallDir:C:\Help Workshop /HcwSetupLocation:C:\Temp\HcwSetup.exe'"`).\
 To have choco remember parameters on upgrade, be sure to set `choco feature enable -n=useRememberedArgumentsForUpgrades`.
 	</description>
   </metadata>

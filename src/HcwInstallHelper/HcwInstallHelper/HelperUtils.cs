@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -29,6 +30,29 @@ namespace HcwInstallHelper
             {
                 return null;
             }
+        }
+
+
+        // Ensure trailing path delimiter
+        public static string EnsureTrailingPathDelimiter(string path)
+        {
+            if (path.Length > 0)
+            {
+                char lastChar = path[path.Length - 1];
+                if ((lastChar == Path.DirectorySeparatorChar) || (lastChar == Path.AltDirectorySeparatorChar))
+                {
+                    return path;
+                }
+            }
+            if (path.IndexOf(Path.AltDirectorySeparatorChar) >= 0)
+            {
+                return (path + Path.AltDirectorySeparatorChar);
+            }
+            else
+            {
+                return (path + Path.DirectorySeparatorChar);
+            }
+
         }
     }
 
