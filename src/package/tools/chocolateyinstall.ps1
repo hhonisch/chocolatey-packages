@@ -35,10 +35,8 @@ try {
     Get-ChocolateyUnzip -FileFullPath $hcSetupExe -Destination $tmpDir | Out-Null
 
     Write-Host "Running HcwInstallHelper..."
-    & "$toolsDir\HcwInstallHelper.exe" install $tmpDir $pp['InstallDir']
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "HcwInstallHelper returned an error"
-    }
+    $args = "install `"$tmpDir`" `"$($pp['InstallDir'])`""
+    Start-ChocolateyProcessAsAdmin $args "$toolsDir\HcwInstallHelper.exe"
 }
 finally {
     # Cleanup temp dir
