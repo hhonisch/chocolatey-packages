@@ -17,7 +17,5 @@ if (-not $installDir) {
 Write-Host "Install dir: $installDir"
 
 Write-Host "Running HcwInstallHelper..."
-& "$toolsDir\HcwInstallHelper.exe" uninstall $installDir
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "HcwInstallHelper returned an error"
-}
+$args = "uninstall `"$installDir`""
+Start-ChocolateyProcessAsAdmin $args "$toolsDir\HcwInstallHelper.exe"
