@@ -5,6 +5,7 @@
         <DistDir>$(MSBuildProjectDirectory)\..\dist</DistDir>
         <PackageDir>$(MSBuildProjectDirectory)\..\src\package</PackageDir>
         <InstallHelperDir>$(MSBuildProjectDirectory)\..\src\HcwInstallHelper</InstallHelperDir>
+        <TestRootDir>$(MSBuildProjectDirectory)\..\test</TestRootDir>
         <BuildNo>0</BuildNo>
         <BuildNoOffset>0</BuildNoOffset>
     </PropertyGroup>
@@ -86,4 +87,14 @@
     <!-- Github Build -->
     <Target Name="GithubBuild" DependsOnTargets="Build"/>
   
+  
+    <!-- Launch Integration Tests -->
+    <Target Name="IntegrationTest" DependsOnTargets="TestPackageInstall"/>
+    
+    
+    <!-- Test installing package -->
+    <Target Name="TestPackageInstall">
+        <Exec Command="$(TestRootDir)\TestPackageInstall.bat" WorkingDirectory="$(TestRootDir)"/>
+    </Target>
+ 
 </Project>

@@ -42,3 +42,43 @@ jobs:
           path: |
             ./dist/*
             !./dist/.keep
+
+
+  # Run integration tests with artifacts from build job
+  test:
+    needs: build
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [windows-2016, windows-2019]
+    steps:
+      # Checkout source tree
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # We need msbuild
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      # Download artifacts from build job
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: Dist
+          path: ./dist
+
+      # Run integration tests
+      - name: "Run integration tests"
+        timeout-minutes: 5
+        run: msbuild .\build\build.proj /t:IntegrationTest
+
+      # Upload the integration test logs for possible inspections
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: TestLogs
+          path: |
+            ./test/log/*
+            !./test/log/.keep
+
