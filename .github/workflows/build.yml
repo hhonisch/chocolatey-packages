@@ -1,0 +1,40 @@
+name: Build and Test
+
+on: [push, workflow_dispatch]
+
+jobs:
+  
+  # Build main artifacts
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Output run ID - in case we need it to release the artifacts. 
+      # For information, also dump entire GitHub context.
+      - name: "Current run ID ${{github.run_id}}: Dump Context"
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          echo "Run ID: ${{github.run_id}}"
+          echo ${env:GITHUB_CONTEXT}
+
+      # Checkout source tree
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # We need msbuild
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      # Build artifacts
+      - name: Build
+        run: msbuild .\build\build.proj /t:GithubBuild /p:BuildNo=${{github.run_number}}
+
+      # Upload arifacts to make them available for next job
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Dist
+          path: |
+            ./dist/*
+            !./dist/.keep
