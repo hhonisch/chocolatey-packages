@@ -1,0 +1,100 @@
+# Create a release from a given build run ID
+
+name: Create Release from Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildRunId:
+        description: 'Github Run ID of build run of which to use artifacts'
+        required: true
+
+jobs:
+  release_from_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      #- name: View context attributes
+      #  uses: actions/github-script@0.9.0
+      #  with:
+      #    script: |
+      #      console.log(context)
+       
+      # Get artifacts URL from given build run
+      - name: Get artifact download URL
+        id: get-dist-artifact-url
+        uses: actions/github-script@0.9.0
+        env:
+          MY_ARTIFACT_NAME: "Dist"
+          MY_RUN_ID: ${{github.event.inputs.buildRunId}}
+        with:
+          script: |
+            try {
+              // Get list of artifacts for given run 
+              const opts = github.actions.listWorkflowRunArtifacts.endpoint.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: process.env.MY_RUN_ID
+              })
+              const artifacts = await github.paginate(opts)
+
+              // Find artifact with desired name
+              var distArtifact = null
+              for(const artifact of artifacts) {
+                if(artifact.name == process.env.MY_ARTIFACT_NAME) {
+                  distArtifact = artifact
+                }
+              }
+              if (!distArtifact) {
+                throw "Artifact not found"
+              }
+              return distArtifact
+            } catch (error) {
+              core.setFailed(error.message)
+            }
+            
+      # Download build artifacts
+      - name: Download build artifacts
+        id: download-build-artifacts
+        if: steps.get-dist-artifact-url.outputs.result != ''
+        run: |
+          MY_DOWNLOAD_URL=${{fromJson(steps.get-dist-artifact-url.outputs.result).archive_download_url}}
+          echo "Downloading $MY_DOWNLOAD_URL"
+          curl -L -o Dist.zip -H "Authorization: token ${{secrets.GITHUB_TOKEN}}" $MY_DOWNLOAD_URL
+          echo "Unzipping..."
+          unzip Dist.zip -d dist
+          META=$(cat ./dist/meta.json)
+          echo "::set-output name=result::$META"
+
+      # Dump build info
+      - name: Dump build info
+        run: |
+          echo "Commit hash: ${{fromJson(steps.download-build-artifacts.outputs.result).commitHash}}"
+          echo "Version: ${{fromJson(steps.download-build-artifacts.outputs.result).version}}"
+
+      # Create release from build info
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: v${{fromJson(steps.download-build-artifacts.outputs.result).version}} 
+          release_name: Release ${{fromJson(steps.download-build-artifacts.outputs.result).version}}
+          commitish: ${{fromJson(steps.download-build-artifacts.outputs.result).commitHash}}
+          body_path: ./dist/RELEASE_NOTES.md
+          draft: true
+          prerelease: true
+
+      # Upload asset to release
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.create_release.outputs.upload_url}} 
+          asset_path: ./dist/Setup_WinHelp4Win10.exe
+          asset_name: WinHelp4Win10-${{fromJson(steps.download-build-artifacts.outputs.result).version}}-Setup.exe
+          asset_content_type: application/octet-stream
+          
