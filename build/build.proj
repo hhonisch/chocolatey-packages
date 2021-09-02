@@ -6,8 +6,6 @@
         <PackageDir>$(MSBuildProjectDirectory)\..\src\package</PackageDir>
         <InstallHelperDir>$(MSBuildProjectDirectory)\..\src\HcwInstallHelper</InstallHelperDir>
         <TestRootDir>$(MSBuildProjectDirectory)\..\test</TestRootDir>
-        <BuildNo>0</BuildNo>
-        <BuildNoOffset>0</BuildNoOffset>
     </PropertyGroup>
 
     <ItemGroup>
@@ -55,6 +53,12 @@
     <Target Name="Clean" DependsOnTargets="CleanDist;CleanBin;CleanInstallHelper;CleanPackage"/>
 
 
+    <!-- Set version -->
+    <Target Name="SetVersion">
+        <Exec Command="powershell.exe –NonInteractive –ExecutionPolicy Unrestricted &quot;&amp; &#39;$(MSBuildProjectDirectory)\set_version.ps1&#39;&quot;"/>
+    </Target>
+
+
     <!-- Build InstallHelper -->
     <Target Name="BuildInstallHelper">
         <!-- Build binaries -->
@@ -85,7 +89,7 @@
 
 
     <!-- Github Build -->
-    <Target Name="GithubBuild" DependsOnTargets="Build"/>
+    <Target Name="GithubBuild" DependsOnTargets="SetVersion;Build"/>
   
   
     <!-- Launch Integration Tests -->
