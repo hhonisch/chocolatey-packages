@@ -44,7 +44,7 @@ set ERROR_OCCURRED=1
 echo.
 echo *** Get chocolatey.log
 echo.
-copy /Y "%ChocolateyInstall%\logs\chocolatey.log" "%MYDIR%\chocolatey.log"
+copy /Y "%ChocolateyInstall%\logs\chocolatey.log" "%MYDIR%\log\chocolatey.log"
 echo.
 echo ************************************************************
 if not "%ERROR_OCCURRED%"=="" (
