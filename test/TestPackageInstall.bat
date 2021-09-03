@@ -10,6 +10,12 @@ echo ************************************************************
 
 set PACKAGE_SOURCE_DIR=%MYDIR%\..\Dist
 set PACKAGE_INSTALL_DIR=%MYDIR%\Help Workshop Install
+set CHOCOLATEY_LOG=%ChocolateyInstall%\logs\chocolatey.log
+
+echo.
+echo *** Clear chocolatey log
+echo.
+del /F "%CHOCOLATEY_LOG%"
 
 echo.
 echo *** Install chocolatey package ***
@@ -44,7 +50,7 @@ set ERROR_OCCURRED=1
 echo.
 echo *** Get chocolatey.log
 echo.
-copy /Y "%ChocolateyInstall%\logs\chocolatey.log" "%MYDIR%\log\chocolatey.log"
+copy /Y "%CHOCOLATEY_LOG%" "%MYDIR%\log\chocolatey.log"
 echo.
 echo ************************************************************
 if not "%ERROR_OCCURRED%"=="" (
