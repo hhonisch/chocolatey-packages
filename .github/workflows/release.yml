@@ -77,7 +77,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            : ${{secrets.GITHUB_TOKEN}}
         with:
           tag_name: v${{fromJson(steps.download-build-artifacts.outputs.result).version}} 
           release_name: Release ${{fromJson(steps.download-build-artifacts.outputs.result).version}}
@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}} 
-          asset_path: ./dist/Setup_WinHelp4Win10.exe
-          asset_name: WinHelp4Win10-${{fromJson(steps.download-build-artifacts.outputs.result).version}}-Setup.exe
+          asset_path: ./dist/help-workshop.${{fromJson(steps.download-build-artifacts.outputs.result).version}}.nupkg
+          asset_name: help-workshop.${{fromJson(steps.download-build-artifacts.outputs.result).version}}.nupkg
           asset_content_type: application/octet-stream
           
