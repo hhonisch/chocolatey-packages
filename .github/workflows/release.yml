@@ -75,26 +75,15 @@ jobs:
       # Create release from build info
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
-            : ${{secrets.GITHUB_TOKEN}}
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
-          tag_name: v${{fromJson(steps.download-build-artifacts.outputs.result).version}} 
-          release_name: Release ${{fromJson(steps.download-build-artifacts.outputs.result).version}}
-          commitish: ${{fromJson(steps.download-build-artifacts.outputs.result).commitHash}}
-          body_path: ./dist/RELEASE_NOTES.md
+          tag: v${{fromJson(steps.download-build-artifacts.outputs.result).version}} 
+          name: Release ${{fromJson(steps.download-build-artifacts.outputs.result).version}}
+          commit: ${{fromJson(steps.download-build-artifacts.outputs.result).commitHash}}
+          bodyFile: ./dist/RELEASE_NOTES.md
+          artifacts: ./dist/help-workshop.${{fromJson(steps.download-build-artifacts.outputs.result).version}}.nupkg
           draft: true
           prerelease: true
-
-      # Upload asset to release
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        with:
-          upload_url: ${{steps.create_release.outputs.upload_url}} 
-          asset_path: ./dist/help-workshop.${{fromJson(steps.download-build-artifacts.outputs.result).version}}.nupkg
-          asset_name: help-workshop.${{fromJson(steps.download-build-artifacts.outputs.result).version}}.nupkg
-          asset_content_type: application/octet-stream
-          
+          token: ${{secrets.GITHUB_TOKEN}}
