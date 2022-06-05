@@ -1,0 +1,7 @@
+﻿VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community
+in verifying that this package's contents are trustworthy.
+ 
+This package contains the binary file "HcwInstallHelper.exe", which extracts application files from the Microsoft Help Workshop installer "HcwSetup.exe".
+The source code for "HcwInstallHelper.exe" is part of the GitHub repository that hosts the sources for this Chocolatey package, see https://github.com/hhonisch/chocolatey.help-workshop/tree/main/src/HcwInstallHelper
+The file "HcwInstallHelper.exe" is built from source during the Chocolatey package release process using GitHub Actions and a GitHub-hosted runner, which by all means should be a safe build environment.
