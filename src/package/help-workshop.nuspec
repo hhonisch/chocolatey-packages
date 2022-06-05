@@ -22,7 +22,7 @@ The following package parameters can be set:
 
  * `/InstallDir:` - Where to install the binaries to - defaults to "`$env:ProgramFiles(x86)`" on 64 bit Windows and "`$env:ProgramFiles`" on 32 bit Windows
  * `/HcwSetupLocation:` - Where to get Help Workshop setup (hcwsetup.exe) from - may be either a URL (http:// or https:// or file://) or a path.\
-   Defaults "`https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe"`
+   Defaults to "`https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe`"
  
 
 To pass parameters, use `--params "''"` (e.g. `choco install help-workshop [other options] --params="'/InstallDir:C:\Help Workshop /HcwSetupLocation:C:\Temp\HcwSetup.exe'"`).\
@@ -30,9 +30,11 @@ To have choco remember parameters on upgrade, be sure to set `choco feature enab
 	</description>
   </metadata>
   <files>
-    <file src="tools\chocolatey*.ps1" target="tools" />
+    <file src="tools\chocolateyinstall.ps1" target="tools" />
+    <file src="tools\chocolateyuninstall.ps1" target="tools" />
     <file src="tools\.skipAutoUninstall" target="tools" />
     <file src="tools\*.ignore" target="tools" />
+    <file src="tools\VERIFICATION.txt" target="tools" />
     <file src="..\..\bin\HcwInstallHelper.exe" target="tools" />
     <file src="..\..\bin\HcwInstallHelper.exe.config" target="tools" />
     <file src="..\..\LICENSE.md" target="tools" />
