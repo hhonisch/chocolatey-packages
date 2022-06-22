@@ -14,7 +14,6 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 
-
 # Set version for Chocolatey package
 function SetVersionChocoPackage($ver) {
     Write-Host "Setting version in Chocolatey package"
@@ -32,6 +31,22 @@ function SetVersionChocoPackage($ver) {
 }
 
 
+# Set version for HcwInstallHelper
+function SetVersionInstallHelper($ver) {
+    Write-Host "Setting version in HcwInstallHelper"
+    $rcPath = Join-Path $PSScriptRoot "..\src\HcwInstallHelper\HcwInstallHelper\Resource.rc"
+    Write-Host "Reading $rcPath..."
+    $rcOld = Get-Content $rcPath
+    $rcNew = [System.Collections.ArrayList]::new()
+    foreach ($line in $rcOld) {
+        $line = $line -replace '^(\s*(?:FILE|PRODUCT)VERSION\s+).*$' , "`${1}$($ver.major),$($ver.minor),$($ver.patch),$($ver.build)"
+        $line = $line -replace '^(\s*VALUE\s+"(?:File|Product)Version"\s*,\s*).*$' , "`${1}`"$($ver.major).$($ver.minor).$($ver.patch).$($ver.build)`""
+        $rcNew.Add($line) | Out-Null
+    }
+    Write-Host "Writing $rcPath..."
+    $rcNew | Out-File $rcPath -Encoding "unicode"
+    Write-Host "Done: Setting version in HcwInstallHelper"
+}
 
 
 # Main function
@@ -56,6 +71,9 @@ function Main() {
     
     # Set version for chocolatey package
     SetVersionChocoPackage $ver
+
+    # Set version for HcwInstallHelper
+    SetVersionInstallHelper $ver
 
     Write-Host "Done: Setting version in source files"
 }

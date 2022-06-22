@@ -9,8 +9,8 @@ Microsoft Help Workshop takes the information in the project (.hpj) file to comb
 The following package parameters can be set:
 
  * `/InstallDir:` - Directory where to install the Microsoft Help Workshop files - defaults to "`$env:ProgramFiles(x86)`" on 64 bit Windows and "`$env:ProgramFiles`" on 32 bit Windows
- * `/HcwSetupLocation:` - Location of Microsoft Help Workshop Setup (hcwsetup.exe) v4.03 - may be either a URL (http:// or https:// or file://) or a path.\
-   Defaults "`https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe"`
+ * `/HcwSetupLocation:` - Location of Microsoft Help Workshop Setup (hcwsetup.exe) v4.03 - may be either a URL (http(s):// or file://) or a path.\
+   If no location is specified, Help Workshop Setup is downloaded from "`https://download.microsoft.com/download/word97win/Utility/4.03/WIN98/EN-US/Hcwsetup.exe "`
  
 
 To pass parameters, use `--params "''"` (e.g. `choco install help-workshop [other options] --params="'/InstallDir:C:\Help Workshop /HcwSetupLocation:C:\Temp\HcwSetup.exe'"`).\

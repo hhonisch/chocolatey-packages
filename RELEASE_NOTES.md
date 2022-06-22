@@ -1,1 +1,1 @@
-# Release Notes Placeholder
+This [Chocolatey](https://chocolatey.org/) package installs Microsoft Help Workshop 4.03.0002

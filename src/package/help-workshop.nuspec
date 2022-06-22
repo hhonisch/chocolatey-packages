@@ -36,7 +36,6 @@ To have choco remember parameters on upgrade, be sure to set `choco feature enab
     <file src="tools\*.ignore" target="tools" />
     <file src="tools\VERIFICATION.txt" target="tools" />
     <file src="..\..\bin\HcwInstallHelper.exe" target="tools" />
-    <file src="..\..\bin\HcwInstallHelper.exe.config" target="tools" />
     <file src="..\..\LICENSE.md" target="tools" />
   </files>
 </package>

@@ -80,7 +80,7 @@ jobs:
             GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           tag: v${{fromJson(steps.download-build-artifacts.outputs.result).version}} 
-          name: Release ${{fromJson(steps.download-build-artifacts.outputs.result).version}}
+          name: "Chocolatey Package: Microsoft Help Workshop ${{fromJson(steps.download-build-artifacts.outputs.result).version}}"
           commit: ${{fromJson(steps.download-build-artifacts.outputs.result).commitHash}}
           bodyFile: ./dist/RELEASE_NOTES.md
           artifacts: ./dist/help-workshop.${{fromJson(steps.download-build-artifacts.outputs.result).version}}.nupkg
